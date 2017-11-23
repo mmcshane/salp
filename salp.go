@@ -77,8 +77,7 @@ type Provider struct {
 }
 
 type Probe struct {
-	name string
-	p    *C.struct___0
+	p *C.struct_SDTProbe
 }
 
 type ProbeArgType C.ArgType_t
@@ -130,7 +129,7 @@ func (p Provider) AddProbe(name string, argTypes ...ProbeArgType) (Probe, error)
 	cname := C.CString(name)
 	defer C.free(unsafe.Pointer(cname))
 
-	var pp *C.struct___0
+	var pp *C.struct_SDTProbe
 	if l := len(argTypes); l == 0 {
 		pp = C.salp_providerAddProbe(p.p, cname, 0, nil)
 	} else {
@@ -140,7 +139,7 @@ func (p Provider) AddProbe(name string, argTypes ...ProbeArgType) (Probe, error)
 	if pp == nil {
 		return Probe{}, p.err()
 	}
-	return Probe{name, pp}, nil
+	return Probe{pp}, nil
 }
 
 func MustAddProbe(p Provider, name string, argTypes ...ProbeArgType) Probe {
@@ -193,5 +192,5 @@ func (p Probe) Fire(args ...interface{}) {
 }
 
 func (p Probe) Name() string {
-	return p.name
+	return C.GoString(p.p.name)
 }
