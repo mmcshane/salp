@@ -39,16 +39,16 @@ the [bcc](https://github.com/iovisor/bcc) project. Use two terminals to run the
 demo - one to execute the tracable salpdemo go program and one to run the bcc
 tools and see their output. In the first window run
 
-```
-$ go run cmd/demo/*.go
+```bash
+go run cmd/demo/*.go
 ```
 
 This program will print out how to monitor itself but then won't print out
 anything after that. In the second window run the bcc trace program on the
 `salpdemo` process, monitoring probes `p1` and `p2`.
 
-```
-# trace -p "$(pgrep salpdemo | head -n1)" \
+```bash
+sudo trace -p "$(pgrep salpdemo | head -n1)" \
     'u::p1 "arg1=%d arg2=%s", arg1, arg2' \
     'u::p2 "arg1=%d", arg1'
 ```
