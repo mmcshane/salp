@@ -3,11 +3,15 @@ package salp
 /*
 #cgo LDFLAGS: -lstapsdt
 
+#include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <libstapsdt.h>
 
-SDTProbe_t* salp_providerAddProbe(SDTProvider_t* p, const char* name, uint32_t c, ArgType_t* at){
+// This wrapper is necessary only because CGO cannot invoke varargs functions
+SDTProbe_t* salp_providerAddProbe(SDTProvider_t* p, const char* name,
+									uint32_t c, ArgType_t* at){
+	assert(6 == MAX_ARGUMENTS); // MAX_ARGUMENTS is from libstapsdt.h
 	switch(c) {
 		case 0:
 			return providerAddProbe(p, name, 0);
@@ -20,19 +24,18 @@ SDTProbe_t* salp_providerAddProbe(SDTProvider_t* p, const char* name, uint32_t c
 		case 4:
 			return providerAddProbe(p, name, 4, at[0], at[1], at[2], at[3]);
 		case 5:
-			return providerAddProbe(p, name, 5, at[0], at[1], at[2], at[3], at[4]);
-		case 6:
-			return providerAddProbe(p, name, 6, at[0], at[1], at[2], at[3], at[4], at[5]);
+			return providerAddProbe(
+				p, name, 5, at[0], at[1], at[2], at[3], at[4]);
 		default:
-			return 0;
+			// any args after the first six are ignored
+			return providerAddProbe(
+				p, name, 6, at[0], at[1], at[2], at[3], at[4], at[5]);
 	}
 }
 
-void salp_probeFire(SDTProbe_t* p, int c, void** args) {
-	if(c != p->argCount) {
-		return;
-	}
-	switch(c) {
+void salp_probeFire(SDTProbe_t* p, void** args) {
+	assert(p->argCount <= MAX_ARGUMENTS); // MAX_ARGUMENTS is from libstapsdt.h
+	switch(p->argCount) {
 		case 0:
 			probeFire(p);
 			return;
@@ -53,9 +56,6 @@ void salp_probeFire(SDTProbe_t* p, int c, void** args) {
 			return;
 		case 6:
 			probeFire(p, args[0], args[1], args[2], args[3], args[4], args[5]);
-			return;
-		default:
-			probeFire(p);
 			return;
 	}
 }
@@ -101,9 +101,7 @@ func (e stapsdtError) Error() string {
 func MakeProvider(name string) Provider {
 	clbl := C.CString(name)
 	defer C.free(unsafe.Pointer(clbl))
-	return Provider{
-		p: C.providerInit(clbl),
-	}
+	return Provider{C.providerInit(clbl)}
 }
 
 func (p Provider) Name() string {
@@ -163,6 +161,9 @@ func (p Probe) Enabled() bool {
 }
 
 func (p Probe) Fire(args ...interface{}) {
+	if len(args) != int(p.p.argCount) {
+		return
+	}
 	ba := [6]unsafe.Pointer{}
 	for i := 0; i < len(args) && i < 5; i++ {
 		switch ta := args[i].(type) {
@@ -188,7 +189,7 @@ func (p Probe) Fire(args ...interface{}) {
 			ba[i] = strptr
 		}
 	}
-	C.salp_probeFire(p.p, C.int(len(args)), &ba[0])
+	C.salp_probeFire(p.p, &ba[0])
 }
 
 func (p Probe) Name() string {
