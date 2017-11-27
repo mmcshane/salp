@@ -6,11 +6,11 @@ Salp is a small Go wrapper for the [libstapsdt](https://github.com/sthima/libsta
 
 ### Dependencies
 Salp depends on `libstapsdt` which in turn depends on `libelf` and `libdl`.
-`libstapsdt` can be build from source or (for debian based distros) installed
+`libstapsdt` can be built from source or (for debian based distros) installed
 via an Ubuntu PPA. Full instructions are available in the [docs for libstapsdt](http://libstapsdt.readthedocs.io/en/latest/getting-started/getting-started.html)
 
 ### Build and Test
-If `libstdapsdt` is installed globally (e.g. from the PPA above), you should be
+If `libstdapsdt` is installed globally (e.g. from the PPA above or via `make install`), you should be
 able to simply `go build` or `go test`. However if you have built `libstapsdt`
 form source then you will need to tell the `cgo` tool how to find the headers
 and .so files for `libstapsdt` using the `CGO_CFLAGS`, `CGO_LDFLAGS`, and
@@ -20,7 +20,7 @@ and .so files for `libstapsdt` using the `CGO_CFLAGS`, `CGO_LDFLAGS`, and
 This repository contains a demo executable that will fire two different probes
 every second. The demo can be observed using the `trace` and `tplist` tools from
 the [bcc](https://github.com/iovisor/bcc) project. Use two terminals to run the
-demo - one to execute a tracable go program and one to run the bcc tools and see
+demo - one to execute the tracable salpdemo go program and one to run the bcc tools and see
 their output. In the first window run
 
 ```
