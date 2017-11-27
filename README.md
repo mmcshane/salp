@@ -25,6 +25,12 @@ have built `libstapsdt` form source then you will need to tell the `cgo` tool
 how to find the headers and .so files for `libstapsdt` using the `CGO_CFLAGS`,
 `CGO_LDFLAGS`, and `LD_LIBRARY_PATH` environment variables.
 
+```bash
+export CGO_CFLAGS="-I/path/to/libstapsdt/src"
+export CGO_LDFLAGS="-L/path/to/libstapsdt/out"
+export LD_LIBRARY_PATH="/path/to/libstapsdt/out"
+```
+
 ## Demo
 
 This repository contains a demo executable that will fire two different probes
