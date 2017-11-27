@@ -5,8 +5,8 @@ Salp is a small Go wrapper for the
 programs to create and fire USDT probes at runtime. These probes allow
 API-stable (i.e. not dependent on function names) tracing of executables written
 in Go - especially important since function tracing of Go code requires some
-[unappealing (though not uniimpressive)
-hacks](http://www.brendangregg.com/blog/2017-01-31/golang-bcc-bpf-function-tracing.html).
+unappealing (though not unimpressive)
+[hacks](http://www.brendangregg.com/blog/2017-01-31/golang-bcc-bpf-function-tracing.html).
 
 ## Build
 
