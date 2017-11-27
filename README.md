@@ -42,7 +42,9 @@ anything after that. In the second window run the bcc trace program on the
 `salpdemo` process, monitoring probes `p1` and `p2`.
 
 ```
-# trace -p "$(pgrep salpdemo)" 'u::p1 "arg1=%d arg2=%s", arg1, arg2' 'u::p2 "arg1=%d", arg1'
+# trace -p "$(pgrep salpdemo | head -n1)" \
+    'u::p1 "arg1=%d arg2=%s", arg1, arg2' \
+    'u::p2 "arg1=%d", arg1'
 ```
 
 `trace` will output the values of `arg1` and `arg2` from probe `p1` and the
