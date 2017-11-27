@@ -1,27 +1,37 @@
 # Salp
 
-Salp is a small Go wrapper for the [libstapsdt](https://github.com/sthima/libstapsdt) library that enables Go programs to create and fire USDT probes at runtime.
+Salp is a small Go wrapper for the
+[libstapsdt](https://github.com/sthima/libstapsdt) library that enables Go
+programs to create and fire USDT probes at runtime. These probes allow
+API-stable (i.e. not dependent on function names) tracing of executables written
+in Go - especially important since function tracing of Go code requires some
+[unappealing (though not uniimpressive)
+hacks](http://www.brendangregg.com/blog/2017-01-31/golang-bcc-bpf-function-tracing.html).
 
 ## Build
 
 ### Dependencies
+
 Salp depends on `libstapsdt` which in turn depends on `libelf` and `libdl`.
 `libstapsdt` can be built from source or (for debian based distros) installed
-via an Ubuntu PPA. Full instructions are available in the [docs for libstapsdt](http://libstapsdt.readthedocs.io/en/latest/getting-started/getting-started.html)
+via an Ubuntu PPA. Full instructions are available in the [docs for
+libstapsdt](http://libstapsdt.readthedocs.io/en/latest/getting-started/getting-started.html)
 
 ### Build and Test
-If `libstdapsdt` is installed globally (e.g. from the PPA above or via `make install`), you should be
-able to simply `go build` or `go test`. However if you have built `libstapsdt`
-form source then you will need to tell the `cgo` tool how to find the headers
-and .so files for `libstapsdt` using the `CGO_CFLAGS`, `CGO_LDFLAGS`, and
-`LD_LIBRARY_PATH` environment variables.
+
+If `libstdapsdt` is installed globally (e.g. from the PPA above or via `make
+install`), you should be able to simply `go build` or `go test`. However if you
+have built `libstapsdt` form source then you will need to tell the `cgo` tool
+how to find the headers and .so files for `libstapsdt` using the `CGO_CFLAGS`,
+`CGO_LDFLAGS`, and `LD_LIBRARY_PATH` environment variables.
 
 ## Demo
+
 This repository contains a demo executable that will fire two different probes
 every second. The demo can be observed using the `trace` and `tplist` tools from
 the [bcc](https://github.com/iovisor/bcc) project. Use two terminals to run the
-demo - one to execute the tracable salpdemo go program and one to run the bcc tools and see
-their output. In the first window run
+demo - one to execute the tracable salpdemo go program and one to run the bcc
+tools and see their output. In the first window run
 
 ```
 $ go run cmd/demo/*.go
