@@ -13,7 +13,7 @@ var (
 	probes = salp.MakeProvider("salp-demo")
 
 	p1 = salp.MustAddProbe(probes, "p1", salp.Int8, salp.String)
-	p2 = salp.MustAddProbe(probes, "p2", salp.Int8, salp.String)
+	p2 = salp.MustAddProbe(probes, "p2", salp.Uint8, salp.String)
 )
 
 func main() {
