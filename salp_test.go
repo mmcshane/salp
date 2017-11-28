@@ -8,6 +8,7 @@ import (
 
 func TestDryFireAProbe(t *testing.T) {
 	pv := salp.MakeProvider("foo")
+	defer salp.UnloadAndDispose(pv)
 	pr, err := pv.AddProbe("bar", salp.String, salp.Int32)
 
 	require(t, err == nil, err)
@@ -15,11 +16,6 @@ func TestDryFireAProbe(t *testing.T) {
 
 	err = pv.Load()
 	require(t, err == nil, err)
-
-	defer func() {
-		pv.Unload()
-		pv.Dispose()
-	}()
 
 	// wrong arity is not an error
 	pr.Fire("bar")

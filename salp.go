@@ -191,6 +191,7 @@ func (p *Provider) Unload() {
 // after this method is invoked.
 func (p *Provider) Dispose() {
 	C.providerDestroy(p.p)
+	p.p = nil
 }
 
 // Enabled returns true iff the provider assiciated with this Probe is in a
@@ -246,4 +247,11 @@ func (p *Probe) Fire(args ...interface{}) {
 // Name gets the name of this Probe as provided when it was originally created.
 func (p *Probe) Name() string {
 	return C.GoString(p.p.name)
+}
+
+// UnloadAndDispose is a convenience function suitable for deferred invocation
+// that calls p.Unload() and then p.Dispose().
+func UnloadAndDispose(p Provider) {
+	p.Unload()
+	p.Dispose()
 }
