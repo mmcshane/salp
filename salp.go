@@ -218,6 +218,10 @@ func (p *Probe) Fire(args ...interface{}) {
 			ba[i] = unsafe.Pointer(uintptr(ta))
 		case uint16:
 			ba[i] = unsafe.Pointer(uintptr(ta))
+		case int:
+			ba[i] = unsafe.Pointer(uintptr(ta))
+		case uint:
+			ba[i] = unsafe.Pointer(uintptr(ta))
 		case int32:
 			ba[i] = unsafe.Pointer(uintptr(ta))
 		case uint32:
@@ -226,10 +230,14 @@ func (p *Probe) Fire(args ...interface{}) {
 			ba[i] = unsafe.Pointer(uintptr(ta))
 		case uint64:
 			ba[i] = unsafe.Pointer(uintptr(ta))
+		case uintptr:
+			ba[i] = unsafe.Pointer(ta)
 		case string:
 			strptr := unsafe.Pointer(C.CString(ta))
 			defer C.free(strptr)
 			ba[i] = strptr
+		default:
+			return
 		}
 	}
 	C.salp_probeFire(p.p, &ba[0])
