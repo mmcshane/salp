@@ -3,15 +3,17 @@ package salp
 /*
 #cgo LDFLAGS: -lstapsdt
 
-#include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <libstapsdt.h>
 
-// This wrapper is necessary only because CGO cannot invoke varargs functions
-SDTProbe_t* salp_providerAddProbe(SDTProvider_t* p, const char* name,
-									uint32_t c, ArgType_t* at){
-	assert(6 == MAX_ARGUMENTS); // MAX_ARGUMENTS is from libstapsdt.h
+#if 6 != MAX_ARGUMENTS
+#	error "libstapsdt max arguments has changed (expected 6)"
+#endif
+
+// This wrapper is necessary only because CGO cannot invoke variadic functions
+SDTProbe_t* salp_providerAddProbe(
+		SDTProvider_t* p, const char* name, uint32_t c, ArgType_t* at){
 	switch(c) {
 		case 0:
 			return providerAddProbe(p, name, 0);
@@ -33,9 +35,8 @@ SDTProbe_t* salp_providerAddProbe(SDTProvider_t* p, const char* name,
 	}
 }
 
-// This wrapper is necessary only because CGO cannot invoke varargs functions
+// This wrapper is necessary only because CGO cannot invoke variadic functions
 void salp_probeFire(SDTProbe_t* p, void** args) {
-	assert(p->argCount <= MAX_ARGUMENTS); // MAX_ARGUMENTS is from libstapsdt.h
 	switch(p->argCount) {
 		case 0:
 			probeFire(p);
