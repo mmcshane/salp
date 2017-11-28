@@ -24,24 +24,26 @@ func main() {
 
 	probes.Load()
 
+	defer func() {
+		probes.Unload()
+		probes.Dispose()
+	}()
+
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 
 	var i, j int8
 
-loop:
 	for {
 		select {
 		case <-c:
-			break loop
-		case <-time.After(1 * time.Second):
-			s := time.Now().Format(time.RFC850)
+			return
+		case now := <-time.After(1 * time.Second):
+			s := now.Format(time.RFC1123Z)
 			p1.Fire(i, s)
 			p2.Fire(j, s)
 			i += 1
 			j += 2
 		}
 	}
-	probes.Unload()
-	probes.Dispose()
 }
