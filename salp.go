@@ -126,11 +126,11 @@ func MakeProvider(name string) Provider {
 }
 
 // Name returns the name of the provider as a string
-func (p Provider) Name() string {
+func (p *Provider) Name() string {
 	return C.GoString(p.p.name)
 }
 
-func (p Provider) err() error {
+func (p *Provider) err() error {
 	return stapsdtError{
 		code: int(p.p.errno),
 		msg:  C.GoString(p.p.error),
@@ -140,7 +140,7 @@ func (p Provider) err() error {
 // Load transitions the provider from the unloaded state into the loaded state
 // which causes associated Probes to become active (i.e. calling Fire() on the
 // probe will actually work).
-func (p Provider) Load() error {
+func (p *Provider) Load() error {
 	rc := C.providerLoad(p.p)
 	if int(rc) != 0 {
 		return p.err()
@@ -151,7 +151,7 @@ func (p Provider) Load() error {
 // AddProbe creates a new Probe instance with the supplied name and assiciates
 // it with this Provider. The argTypes describe the arguments that are expected
 // to be supplied when Fire is called on this Probe.
-func (p Provider) AddProbe(name string, argTypes ...ProbeArgType) (Probe, error) {
+func (p *Provider) AddProbe(name string, argTypes ...ProbeArgType) (Probe, error) {
 	cname := C.CString(name)
 	defer C.free(unsafe.Pointer(cname))
 
@@ -181,28 +181,28 @@ func MustAddProbe(p Provider, name string, argTypes ...ProbeArgType) Probe {
 
 // Unload transitions this Provider from the loaded to the unloaded state.
 // Associated probes are detached and must be re-attached in order to function.
-func (p Provider) Unload() {
+func (p *Provider) Unload() {
 	C.providerUnload(p.p)
 }
 
 // Dispose cleans up the Provider datastructures and frees associated memory
 // from the underlying C library (libstapsdt). The Provider instance is useless
 // after this method is invoked.
-func (p Provider) Dispose() {
+func (p *Provider) Dispose() {
 	C.providerDestroy(p.p)
 }
 
 // Enabled returns true iff the provider assiciated with this Probe is in a
 // loaded state and the Probe is being monitored by an agent such as the bcc
 // trace tool.
-func (p Probe) Enabled() bool {
+func (p *Probe) Enabled() bool {
 	return int(C.probeIsEnabled(p.p)) == 1
 }
 
 // Fire invokes the Probe with the provided arguments. The type and arity of
 // this invocation should match what was described by the ProbeArgType arguments
 // orginally given to the Provider.AddProbe invocation that created this Probe.
-func (p Probe) Fire(args ...interface{}) {
+func (p *Probe) Fire(args ...interface{}) {
 	if len(args) != int(p.p.argCount) {
 		return
 	}
@@ -235,6 +235,6 @@ func (p Probe) Fire(args ...interface{}) {
 }
 
 // Name gets the name of this Probe as provided when it was originally created.
-func (p Probe) Name() string {
+func (p *Probe) Name() string {
 	return C.GoString(p.p.name)
 }
