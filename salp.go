@@ -201,6 +201,15 @@ func MustAddProbe(p Provider, name string, argTypes ...ProbeArgType) Probe {
 	return prb
 }
 
+// MustLoadProvider is a helper function the either calls Load() on the supplied
+// Provider instance or in the case of an error, panics
+func MustLoadProvider(p Provider) {
+	err := p.Load()
+	if err != nil {
+		panic(err)
+	}
+}
+
 // Unload transitions this Provider from the loaded to the unloaded state.
 // Associated probes are detached and must be re-attached in order to function.
 func (p *Provider) Unload() {

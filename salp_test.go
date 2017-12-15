@@ -66,8 +66,8 @@ func Example() {
 	probe2 := salp.MustAddProbe(provider, "my-other-exmaple-probe", salp.String)
 
 	// Now that the probes have been created, enable the provider by calling
-	// Load()
-	provider.Load()
+	// Load().
+	salp.MustLoadProvider(provider)
 
 	// Initialization of our provider and 2 probes is now complete, the probes
 	// are ready to be fired. Firing probes happens after initialization, inline
