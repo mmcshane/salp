@@ -1,7 +1,9 @@
 package salp_test
 
 import (
+	"strconv"
 	"testing"
+	"time"
 
 	"github.com/mmcshane/salp"
 )
@@ -43,5 +45,38 @@ func require(t *testing.T, b bool, msgs ...interface{}) {
 	t.Helper()
 	if !b {
 		t.Fatal(msgs)
+	}
+}
+
+func Example() {
+	// Provider and probe creation should occur early on, probably during
+	// initialization
+
+	// Create a provider to which we will attach probes. The provider
+	// acts as a namespace & container for probe instances.
+	provider := salp.MakeProvider("my-example-provider")
+	defer salp.UnloadAndDispose(provider)
+
+	// Create a probe that can be fired with 4 args: a string, a uint8,
+	// an int16, and another string
+	probe1 := salp.MustAddProbe(provider, "my-exampele-probe",
+		salp.String, salp.Uint8, salp.Int16, salp.String)
+
+	// Create a second probe that takes only a single string argument
+	probe2 := salp.MustAddProbe(provider, "my-other-exmaple-probe", salp.String)
+
+	// Now that the probes have been created, enable the provider by calling
+	// Load()
+	provider.Load()
+
+	// Initialization of our provider and 2 probes is now complete, the probes
+	// are ready to be fired. Firing probes happens after initialization, inline
+	// with execution of your program.
+
+	// Fire both probes 10 times
+	for i := 0; i < 10; i++ {
+		probe1.Fire(strconv.Itoa(i), 5, 10, "foo")
+		probe2.Fire(time.Now().Format(time.RFC1123))
+		time.Sleep(1 * time.Second)
 	}
 }

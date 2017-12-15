@@ -1,3 +1,7 @@
+// The salp package enables the definition and firing of USDT probes at runtime
+// by Go programs running on Linux. These probes impose little or no overhead
+// when not in use and are available for use by any tool that is able to monitor
+// USDT probe points (e.g. the trace tool from the bcc project).
 package salp
 
 /*
@@ -93,14 +97,31 @@ type ProbeArgType C.ArgType_t
 // ProbeArgTypes are used to specify the type of parameters accepted when firing
 // a Probe
 const (
-	Uint8  = ProbeArgType(C.uint8)
-	Int8   = ProbeArgType(C.int8)
+	// Probe argument should be treated as a uint8
+	Uint8 = ProbeArgType(C.uint8)
+
+	// Probe argument should be treated as an int8
+	Int8 = ProbeArgType(C.int8)
+
+	// Probe argument should be treated as a uint16
 	Uint16 = ProbeArgType(C.uint16)
-	Int16  = ProbeArgType(C.int16)
+
+	// Probe argument should be treated as an int16
+	Int16 = ProbeArgType(C.int16)
+
+	// Probe argument should be treated as a uint32
 	Uint32 = ProbeArgType(C.uint32)
-	Int32  = ProbeArgType(C.int32)
+
+	// Probe argument should be treated as an int32
+	Int32 = ProbeArgType(C.int32)
+
+	// Probe argument should be treated as a uint64
 	Uint64 = ProbeArgType(C.uint64)
-	Int64  = ProbeArgType(C.int64)
+
+	// Probe argument should be treated as an int64
+	Int64 = ProbeArgType(C.int64)
+
+	// Probe argument should be treated as a uint64
 	String = ProbeArgType(C.uint64)
 )
 
