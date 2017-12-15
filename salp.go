@@ -1,7 +1,7 @@
-// The salp package enables the definition and firing of USDT probes at runtime
-// by Go programs running on Linux. These probes impose little or no overhead
-// when not in use and are available for use by any tool that is able to monitor
-// USDT probe points (e.g. the trace tool from the bcc project).
+// Package salp enables the definition and firing of USDT probes at runtime by
+// Go programs running on Linux. These probes impose little or no overhead when
+// not in use and are available for use by any tool that is able to monitor USDT
+// probe points (e.g. the trace tool from the bcc project).
 package salp
 
 /*
