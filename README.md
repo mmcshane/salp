@@ -8,6 +8,8 @@ in Go - especially important since function tracing of Go code requires some
 unappealing (though not unimpressive)
 [hacks](http://www.brendangregg.com/blog/2017-01-31/golang-bcc-bpf-function-tracing.html).
 
+[![GoDoc](https://godoc.org/github.com/mmcshane/salp?status.svg)](https://godoc.org/github.com/mmcshane/salp)
+
 ## Build
 
 ### Dependencies
