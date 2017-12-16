@@ -42,7 +42,7 @@ demo - one to execute the tracable salpdemo go program and one to run the bcc
 tools and see their output. In the first window run
 
 ```bash
-go run cmd/demo/*.go
+go run internal/salpdemo.go
 ```
 
 This program will print out how to monitor itself but then won't print out
