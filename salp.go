@@ -235,7 +235,7 @@ func (p *Probe) Enabled() bool {
 // this invocation should match what was described by the ProbeArgType arguments
 // orginally given to the Provider.AddProbe invocation that created this Probe.
 func (p *Probe) Fire(args ...interface{}) {
-	if len(args) != int(p.p.argCount) {
+	if !p.Enabled() || len(args) != int(p.p.argCount) {
 		return
 	}
 	ba := [6]unsafe.Pointer{}
