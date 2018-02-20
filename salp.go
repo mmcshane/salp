@@ -228,12 +228,19 @@ func (p *Provider) Dispose() {
 // loaded state and the Probe is being monitored by an agent such as the bcc
 // trace tool.
 func (p *Probe) Enabled() bool {
-	return int(C.probeIsEnabled(p.p)) == 1
+	// 130-140ns per call with this impl which kills the whole point of
+	// low-overhead profiling
+	//return int(C.probeIsEnabled(p.p)) == 1 // ~140ns per call
+
+	// 1-2ns per call by avoiding the cgo function call
+	ptr := p.p._fire
+	return uintptr(ptr) != 0 && *(*uint8)(ptr)&0x90 != 0x90
 }
 
 // Fire invokes the Probe with the provided arguments. The type and arity of
 // this invocation should match what was described by the ProbeArgType arguments
 // orginally given to the Provider.AddProbe invocation that created this Probe.
+// Cheap to invoke if the probe is not enabled (see: Enabled())
 func (p *Probe) Fire(args ...interface{}) {
 	if !p.Enabled() || len(args) != int(p.p.argCount) {
 		return

@@ -41,6 +41,20 @@ func TestProbeName(t *testing.T) {
 	require(t, pr.Name() == "bar")
 }
 
+var result bool
+
+func BenchmarkEnabled(b *testing.B) {
+	pv := salp.MakeProvider("foo")
+	pr := salp.MustAddProbe(pv, "bar")
+	salp.MustLoadProvider(pv)
+
+	var tmp bool
+	for i := 0; i < b.N; i++ {
+		tmp = pr.Enabled()
+	}
+	result = tmp
+}
+
 func require(t *testing.T, b bool, msgs ...interface{}) {
 	t.Helper()
 	if !b {
