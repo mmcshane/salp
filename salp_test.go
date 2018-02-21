@@ -55,6 +55,16 @@ func BenchmarkEnabled(b *testing.B) {
 	result = tmp
 }
 
+func BenchmarkFireDisabled(b *testing.B) {
+	pv := salp.MakeProvider("foo")
+	pr := salp.MustAddProbe(pv, "bar", salp.Int32, salp.String)
+	salp.MustLoadProvider(pv)
+
+	for i := 0; i < b.N; i++ {
+		pr.Fire(3, "foo")
+	}
+}
+
 func require(t *testing.T, b bool, msgs ...interface{}) {
 	t.Helper()
 	if !b {
@@ -73,7 +83,7 @@ func Example() {
 
 	// Create a probe that can be fired with 4 args: a string, a uint8,
 	// an int16, and another string
-	probe1 := salp.MustAddProbe(provider, "my-exampele-probe",
+	probe1 := salp.MustAddProbe(provider, "my-example-probe",
 		salp.String, salp.Uint8, salp.Int16, salp.String)
 
 	// Create a second probe that takes only a single string argument
