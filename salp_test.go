@@ -8,6 +8,19 @@ import (
 	"github.com/mmcshane/salp"
 )
 
+func TestProbeWithTooManyArgs(t *testing.T) {
+	pv := salp.MakeProvider("foo")
+	defer salp.UnloadAndDispose(pv)
+
+	_, err := pv.AddProbe("bar", salp.Int8, salp.Int8,
+		salp.Int8, salp.Int8, salp.Int8, salp.Int8)
+	require(t, err == nil, "unexpected error defining probe with 6 args")
+
+	_, err = pv.AddProbe("baz", salp.Int8, salp.Int8,
+		salp.Int8, salp.Int8, salp.Int8, salp.Int8, salp.Int8)
+	require(t, err != nil, "expected error defining probe with 7 args")
+}
+
 func TestDryFireAProbe(t *testing.T) {
 	pv := salp.MakeProvider("foo")
 	defer salp.UnloadAndDispose(pv)

@@ -32,10 +32,11 @@ SDTProbe_t* salp_providerAddProbe(
 		case 5:
 			return providerAddProbe(
 				p, name, 5, at[0], at[1], at[2], at[3], at[4]);
-		default:
-			// any args after the first six are ignored
+		case 6:
 			return providerAddProbe(
-				p, name, 6, at[0], at[1], at[2], at[3], at[4], at[5]);
+				p, name, 5, at[0], at[1], at[2], at[3], at[4], at[5]);
+		default:
+			return NULL;
 	}
 }
 
@@ -228,11 +229,11 @@ func (p *Provider) Dispose() {
 // loaded state and the Probe is being monitored by an agent such as the bcc
 // trace tool.
 func (p *Probe) Enabled() bool {
-	// 130-140ns per call with this impl which kills the whole point of
-	// low-overhead profiling
-	//return int(C.probeIsEnabled(p.p)) == 1 // ~140ns per call
+	// don't do this ...
+	//return int(C.probeIsEnabled(p.p)) == 1
 
-	// 1-2ns per call by avoiding the cgo function call
+	// ~100x lower overhead for this implementation, probably due to avoiding
+	// the CGO context switch and making inlining possible.
 	ptr := p.p._fire
 	return uintptr(ptr) != 0 && *(*uint8)(ptr)&0x90 != 0x90
 }
@@ -246,7 +247,7 @@ func (p *Probe) Fire(args ...interface{}) {
 		return
 	}
 	ba := [6]unsafe.Pointer{}
-	for i := 0; i < len(args) && i < 5; i++ {
+	for i := 0; i < len(args); i++ {
 		switch ta := args[i].(type) {
 		case int8:
 			ba[i] = unsafe.Pointer(uintptr(ta))
