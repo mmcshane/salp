@@ -101,6 +101,12 @@ const (
 	// Probe argument should be treated as a uint8
 	Uint8 = ProbeArgType(C.uint8)
 
+	// Probe argument should be treated as a bool
+	Bool = Uint8
+
+	//Probe argument should be treated as a byte
+	Byte = Uint8
+
 	// Probe argument should be treated as an int8
 	Int8 = ProbeArgType(C.int8)
 
@@ -124,6 +130,9 @@ const (
 
 	// Probe argument should be treated as a uint64
 	String = ProbeArgType(C.uint64)
+
+	// Probe argument should be treated as a Go error
+	Error = String
 )
 
 // Error returns a string describing the error condition. The string will
@@ -249,9 +258,15 @@ func (p *Probe) Fire(args ...interface{}) {
 	ba := [6]unsafe.Pointer{}
 	for i := 0; i < len(args); i++ {
 		switch ta := args[i].(type) {
+		case bool:
+			var arg uint8
+			if ta {
+				arg = 1
+			}
+			ba[i] = unsafe.Pointer(uintptr(arg))
 		case int8:
 			ba[i] = unsafe.Pointer(uintptr(ta))
-		case uint8:
+		case uint8: // catches byte
 			ba[i] = unsafe.Pointer(uintptr(ta))
 		case int16:
 			ba[i] = unsafe.Pointer(uintptr(ta))
@@ -275,6 +290,10 @@ func (p *Probe) Fire(args ...interface{}) {
 			strptr := unsafe.Pointer(C.CString(ta))
 			defer C.free(strptr)
 			ba[i] = strptr
+		case error:
+			cstr := unsafe.Pointer(C.CString(ta.Error()))
+			defer C.free(cstr)
+			ba[i] = cstr
 		default:
 			return
 		}
