@@ -1,12 +1,12 @@
 # Salp
 
-Salp is a small Go wrapper for the
-[libstapsdt](https://github.com/sthima/libstapsdt) library that enables Go
-programs to create and fire USDT probes at runtime. These probes allow
-API-stable (i.e. not dependent on function names) tracing of executables written
-in Go - especially important since function tracing of Go code requires some
-unappealing (though not unimpressive)
+Salp is a library that enables Go programs to create and fire USDT probes at
+runtime. Such probes allow API-stable (i.e. not dependent on function names) 
+tracing of executables written in Go - especially important since function
+tracing of Go code requires some unappealing (though not unimpressive)
 [hacks](http://www.brendangregg.com/blog/2017-01-31/golang-bcc-bpf-function-tracing.html).
+Salp uses the [libstapsdt](https://github.com/sthima/libstapsdt) library to create
+and fire these probes.
 
 [![GoDoc](https://godoc.org/github.com/mmcshane/salp?status.svg)](https://godoc.org/github.com/mmcshane/salp)
 
