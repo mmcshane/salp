@@ -70,11 +70,11 @@ func BenchmarkEnabled(b *testing.B) {
 
 func BenchmarkFireDisabled(b *testing.B) {
 	pv := salp.NewProvider("foo")
-	pr := salp.MustAddProbe(pv, "bar", salp.Int32, salp.String)
+	pr := salp.MustAddProbe(pv, "bar", salp.Int32)
 	salp.MustLoadProvider(pv)
 
 	for i := 0; i < b.N; i++ {
-		pr.Fire(3, "foo")
+		pr.Fire(3)
 	}
 }
 

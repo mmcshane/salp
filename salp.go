@@ -228,7 +228,7 @@ func (p *Provider) Dispose() {
 	p = nil
 }
 
-// Enabled returns true iff the provider assiciated with this Probe is in a
+// Enabled returns true iff the provider associated with this Probe is in a
 // loaded state and the Probe is being monitored by an agent such as the bcc
 // trace tool.
 func (p *Probe) Enabled() bool {
@@ -249,6 +249,17 @@ func (p *Probe) Fire(args ...interface{}) {
 	if !p.Enabled() || len(args) != int(p.argCount) {
 		return
 	}
+
+	// Fire is ~28% faster (linux, x86_64, go 1,10.3) to call with no probes
+	// attached if fireImpl is a separate function. I assume this has to do with
+	// compiler inlining but who cares eabout the reason?  Most of the time Fire
+	// will be calld _without_ a probe attached so we're going to optimize for
+	// that case.
+
+	p.fireImpl(args...)
+}
+
+func (p *Probe) fireImpl(args ...interface{}) {
 	ba := [6]unsafe.Pointer{}
 	for i := 0; i < len(args); i++ {
 		switch ta := args[i].(type) {
