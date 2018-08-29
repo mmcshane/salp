@@ -25,7 +25,7 @@ func main() {
 	fmt.Println("\tor")
 	fmt.Println("\tsudo trace -p \"$(pgrep salpdemo | head -n1)\" 'u::p1 (arg1 % 2 == 0) \"i=%d err='%s'\", arg1, arg2'")
 
-	probes.Load()
+	salp.MustLoadProvider(probes)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
@@ -40,7 +40,7 @@ func main() {
 			s := now.Format(time.RFC1123Z)
 			p1.Fire(i, fmt.Errorf("An error: %d", i), s)
 			p2.Fire(j, j%4 == 0)
-			i += 1
+			i++
 			j += 2
 		}
 	}
