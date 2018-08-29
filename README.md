@@ -23,7 +23,7 @@ libstapsdt](http://libstapsdt.readthedocs.io/en/latest/getting-started/getting-s
 
 If `libstdapsdt` is installed globally (e.g. from the PPA above or via `make
 install`), you should be able to simply `go build` or `go test`. However if you
-have built `libstapsdt` form source then you will need to tell the `cgo` tool
+have built `libstapsdt` from source then you will need to tell the `cgo` tool
 how to find the headers and .so files for `libstapsdt` using the `CGO_CFLAGS`,
 `CGO_LDFLAGS`, and `LD_LIBRARY_PATH` environment variables.
 
