@@ -225,7 +225,6 @@ func (p *Provider) Unload() {
 // after this method is invoked.
 func (p *Provider) Dispose() {
 	C.providerDestroy(p)
-	p = nil
 }
 
 // Enabled returns true iff the provider associated with this Probe is in a
