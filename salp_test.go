@@ -9,7 +9,7 @@ import (
 )
 
 func TestProbeWithTooManyArgs(t *testing.T) {
-	pv := salp.MakeProvider("foo")
+	pv := salp.NewProvider("foo")
 	defer salp.UnloadAndDispose(pv)
 
 	_, err := pv.AddProbe("bar", salp.Int8, salp.Int8,
@@ -22,7 +22,7 @@ func TestProbeWithTooManyArgs(t *testing.T) {
 }
 
 func TestDryFireAProbe(t *testing.T) {
-	pv := salp.MakeProvider("foo")
+	pv := salp.NewProvider("foo")
 	defer salp.UnloadAndDispose(pv)
 	pr, err := pv.AddProbe("bar", salp.String, salp.Int32)
 
@@ -42,12 +42,12 @@ func TestDryFireAProbe(t *testing.T) {
 }
 
 func TestProviderName(t *testing.T) {
-	pv := salp.MakeProvider("foo")
+	pv := salp.NewProvider("foo")
 	require(t, pv.Name() == "foo")
 }
 
 func TestProbeName(t *testing.T) {
-	pv := salp.MakeProvider("foo")
+	pv := salp.NewProvider("foo")
 	pr, err := pv.AddProbe("bar")
 
 	require(t, err == nil, err)
@@ -57,7 +57,7 @@ func TestProbeName(t *testing.T) {
 var result bool
 
 func BenchmarkEnabled(b *testing.B) {
-	pv := salp.MakeProvider("foo")
+	pv := salp.NewProvider("foo")
 	pr := salp.MustAddProbe(pv, "bar")
 	salp.MustLoadProvider(pv)
 
@@ -69,7 +69,7 @@ func BenchmarkEnabled(b *testing.B) {
 }
 
 func BenchmarkFireDisabled(b *testing.B) {
-	pv := salp.MakeProvider("foo")
+	pv := salp.NewProvider("foo")
 	pr := salp.MustAddProbe(pv, "bar", salp.Int32, salp.String)
 	salp.MustLoadProvider(pv)
 
@@ -91,7 +91,7 @@ func Example() {
 
 	// Create a provider to which we will attach probes. The provider
 	// acts as a namespace & container for probe instances.
-	provider := salp.MakeProvider("my-example-provider")
+	provider := salp.NewProvider("my-example-provider")
 	defer salp.UnloadAndDispose(provider)
 
 	// Create a probe that can be fired with 4 args: a string, a uint8,

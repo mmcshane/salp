@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	probes = salp.MakeProvider("salp-demo")
+	probes = salp.NewProvider("salp-demo")
 
 	p1 = salp.MustAddProbe(probes, "p1", salp.Int32, salp.Error, salp.String)
 	p2 = salp.MustAddProbe(probes, "p2", salp.Uint8, salp.Bool)

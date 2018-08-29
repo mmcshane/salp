@@ -80,16 +80,12 @@ type stapsdtError struct {
 }
 
 // Provider represents a named collection of probes
-type Provider struct {
-	p *C.struct_SDTProvider
-}
+type Provider = C.struct_SDTProvider
 
 // Probe is a location in Go code that can be "fired" with a set of arguments
 // such that extrenal tools (e.g. the `trace` tool from bcc) can attach to a
 // running process and inspect the values at runtime.
-type Probe struct {
-	p *C.struct_SDTProbe
-}
+type Probe = C.struct_SDTProbe
 
 // ProbeArgType specifies the type of each individual parameter than can be
 // specified when firing a Probe.
@@ -141,31 +137,29 @@ func (e stapsdtError) Error() string {
 	return fmt.Sprintf("libstapsdt error [%v]: %v", e.code, e.msg)
 }
 
-// MakeProvider creates a libstapsdt error probe provider with the supplied
-// name. The returned type is a reference type (like the golang map or slice
-// type) in that it is small enough to pass by value and can be copied without
-// making a copy of the underlying provider. Provider instances are in either a
-// loaded or an unloaded state. When Provders are unloaded (their initial
-// state), probes can be created via AddProbe. Once the Provider is loaded via
-// the Load() function, the probe set should not be changed. Probes can be
-// cleared from the Provider instance by unloading it via the Unload() function.
-// Probe addition is not threadsafe steps must be taken by clients of this
-// library to ensure that at most one thread is adding a Probe at a time.
-func MakeProvider(name string) Provider {
+// NewProvider creates a libstapsdt error probe provider with the supplied name.
+// Provider instances are in either a loaded or an unloaded state. When Provders
+// are unloaded (their initial state), probes can be created via AddProbe. Once
+// the Provider is loaded via the Load() function, the probe set should not be
+// changed. Probes can be cleared from the Provider instance by unloading it via
+// the Unload() function.  Probe addition is not threadsafe steps must be taken
+// by clients of this library to ensure that at most one thread is adding a
+// Probe at a time.
+func NewProvider(name string) *Provider {
 	clbl := C.CString(name)
 	defer C.free(unsafe.Pointer(clbl))
-	return Provider{C.providerInit(clbl)}
+	return C.providerInit(clbl)
 }
 
 // Name returns the name of the provider as a string
 func (p *Provider) Name() string {
-	return C.GoString(p.p.name)
+	return C.GoString(p.name)
 }
 
 func (p *Provider) err() error {
 	return stapsdtError{
-		code: int(p.p.errno),
-		msg:  C.GoString(p.p.error),
+		code: int(p.errno),
+		msg:  C.GoString(p.error),
 	}
 }
 
@@ -173,7 +167,7 @@ func (p *Provider) err() error {
 // which causes associated Probes to become active (i.e. calling Fire() on the
 // probe will actually work).
 func (p *Provider) Load() error {
-	rc := C.providerLoad(p.p)
+	rc := C.providerLoad(p)
 	if int(rc) != 0 {
 		return p.err()
 	}
@@ -183,27 +177,27 @@ func (p *Provider) Load() error {
 // AddProbe creates a new Probe instance with the supplied name and assiciates
 // it with this Provider. The argTypes describe the arguments that are expected
 // to be supplied when Fire is called on this Probe.
-func (p *Provider) AddProbe(name string, argTypes ...ProbeArgType) (Probe, error) {
+func (p *Provider) AddProbe(name string, argTypes ...ProbeArgType) (*Probe, error) {
 	cname := C.CString(name)
 	defer C.free(unsafe.Pointer(cname))
 
-	var pp *C.struct_SDTProbe
+	var pp *Probe
 	if l := len(argTypes); l == 0 {
-		pp = C.salp_providerAddProbe(p.p, cname, 0, nil)
+		pp = C.salp_providerAddProbe(p, cname, 0, nil)
 	} else {
 		pp = C.salp_providerAddProbe(
-			p.p, cname, C.uint32_t(l), (*C.ArgType_t)(&argTypes[0]))
+			p, cname, C.uint32_t(l), (*C.ArgType_t)(&argTypes[0]))
 	}
 	if pp == nil {
-		return Probe{}, p.err()
+		return nil, p.err()
 	}
-	return Probe{pp}, nil
+	return pp, nil
 }
 
 // MustAddProbe is a helper function that either adds a probe with the supplied
 // name and argument types to the specified provider or, in the case of an
 // error, panics.
-func MustAddProbe(p Provider, name string, argTypes ...ProbeArgType) Probe {
+func MustAddProbe(p *Provider, name string, argTypes ...ProbeArgType) *Probe {
 	prb, err := p.AddProbe(name, argTypes...)
 	if err != nil {
 		panic(err)
@@ -213,7 +207,7 @@ func MustAddProbe(p Provider, name string, argTypes ...ProbeArgType) Probe {
 
 // MustLoadProvider is a helper function the either calls Load() on the supplied
 // Provider instance or in the case of an error, panics
-func MustLoadProvider(p Provider) {
+func MustLoadProvider(p *Provider) {
 	err := p.Load()
 	if err != nil {
 		panic(err)
@@ -223,15 +217,15 @@ func MustLoadProvider(p Provider) {
 // Unload transitions this Provider from the loaded to the unloaded state.
 // Associated probes are detached and must be re-attached in order to function.
 func (p *Provider) Unload() {
-	C.providerUnload(p.p)
+	C.providerUnload(p)
 }
 
 // Dispose cleans up the Provider datastructures and frees associated memory
 // from the underlying C library (libstapsdt). The Provider instance is useless
 // after this method is invoked.
 func (p *Provider) Dispose() {
-	C.providerDestroy(p.p)
-	p.p = nil
+	C.providerDestroy(p)
+	p = nil
 }
 
 // Enabled returns true iff the provider assiciated with this Probe is in a
@@ -239,11 +233,11 @@ func (p *Provider) Dispose() {
 // trace tool.
 func (p *Probe) Enabled() bool {
 	// don't do this ...
-	//return int(C.probeIsEnabled(p.p)) == 1
+	//return int(C.probeIsEnabled(p)) == 1
 
 	// ~100x lower overhead for this implementation, probably due to avoiding
 	// the CGO context switch and making inlining possible.
-	ptr := p.p._fire
+	ptr := p._fire
 	return uintptr(ptr) != 0 && *(*uint8)(ptr)&0x90 != 0x90
 }
 
@@ -252,7 +246,7 @@ func (p *Probe) Enabled() bool {
 // orginally given to the Provider.AddProbe invocation that created this Probe.
 // Cheap to invoke if the probe is not enabled (see: Enabled())
 func (p *Probe) Fire(args ...interface{}) {
-	if !p.Enabled() || len(args) != int(p.p.argCount) {
+	if !p.Enabled() || len(args) != int(p.argCount) {
 		return
 	}
 	ba := [6]unsafe.Pointer{}
@@ -298,17 +292,17 @@ func (p *Probe) Fire(args ...interface{}) {
 			return
 		}
 	}
-	C.salp_probeFire(p.p, &ba[0])
+	C.salp_probeFire(p, &ba[0])
 }
 
 // Name gets the name of this Probe as provided when it was originally created.
 func (p *Probe) Name() string {
-	return C.GoString(p.p.name)
+	return C.GoString(p.name)
 }
 
 // UnloadAndDispose is a convenience function suitable for deferred invocation
 // that calls p.Unload() and then p.Dispose().
-func UnloadAndDispose(p Provider) {
+func UnloadAndDispose(p *Provider) {
 	p.Unload()
 	p.Dispose()
 }
