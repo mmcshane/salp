@@ -243,7 +243,7 @@ func (p *Probe) Enabled() bool {
 
 // Fire invokes the Probe with the provided arguments. The type and arity of
 // this invocation should match what was described by the ProbeArgType arguments
-// orginally given to the Provider.AddProbe invocation that created this Probe.
+// originally given to the Provider.AddProbe invocation that created this Probe.
 // Cheap to invoke if the probe is not enabled (see: Enabled())
 func (p *Probe) Fire(args ...interface{}) {
 	if !p.Enabled() || len(args) != int(p.argCount) {

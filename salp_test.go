@@ -100,7 +100,7 @@ func Example() {
 		salp.String, salp.Uint8, salp.Int16, salp.String)
 
 	// Create a second probe that takes only a single string argument
-	probe2 := salp.MustAddProbe(provider, "my-other-exmaple-probe", salp.String)
+	probe2 := salp.MustAddProbe(provider, "my-other-examaple-probe", salp.String)
 
 	// Now that the probes have been created, enable the provider by calling
 	// Load().
