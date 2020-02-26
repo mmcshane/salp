@@ -81,7 +81,7 @@ func BenchmarkFireDisabled(b *testing.B) {
 func require(t *testing.T, b bool, msgs ...interface{}) {
 	t.Helper()
 	if !b {
-		t.Fatal(msgs)
+		t.Fatal(msgs...)
 	}
 }
 
