@@ -18,12 +18,20 @@ var (
 
 func main() {
 	defer salp.UnloadAndDispose(probes)
-	fmt.Println("List the go probes in this demo with")
-	fmt.Println("\tsudo tplist -vp \"$(pgrep salpdemo)\" \"salp-demo*\"")
-	fmt.Println("Trace this process with")
-	fmt.Println("\tsudo trace -p \"$(pgrep salpdemo | head -n1)\" 'u::p1 \"i=%d err=`%s` date=`%s`\", arg1, arg2, arg3' 'u::p2 \"j=%d flag=%d\", arg1, arg2'")
-	fmt.Println("\tor")
-	fmt.Println("\tsudo trace -p \"$(pgrep salpdemo | head -n1)\" 'u::p1 (arg1 % 2 == 0) \"i=%d err='%s'\", arg1, arg2'")
+	fmt.Println(`List the go probes in this demo
+	# With bcc tools
+	sudo tplist -vp "$(pgrep -n salpdemo)" "*salp-demo*"
+
+	# With bpftrace
+	sudo bpftrace -p "$(pgrep -n salpdemo)" -l "usdt:*:salp-demo:*"
+
+Trace this process
+	# With bcc tools
+	sudo trace -p "$(pgrep -n salpdemo)" 'u::p1 "i=%d err='%s' date='%s'", arg1, arg2, arg3' 'u::p2 "j=%d flag=%d", arg1, arg2'
+
+	# With bpftrace
+	sudo bpftrace -p "$(pgrep -n salpdemo)" -e 'usdt:p1 { printf("%d (%s)\n", arg0, str(arg2)); }'
+	sudo bpftrace -p "$(pgrep -n salpdemo)" -e 'usdt:p2 { if(arg1) { printf("Truthy! %d\n", arg0); } }'`)
 
 	salp.MustLoadProvider(probes)
 

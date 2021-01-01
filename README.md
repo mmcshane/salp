@@ -50,10 +50,19 @@ anything after that. In the second window run the bcc trace program on the
 `salpdemo` process, monitoring probes `p1` and `p2`.
 
 ```bash
-sudo trace -p "$(pgrep salpdemo | head -n1)" \
-    'u::p1 "arg1=%d arg2=%s", arg1, arg2' \
-    'u::p2 "arg1=%d", arg1'
+sudo trace -p "$(pgrep -n salpdemo)"                    \
+    'u::p1 "i=%d err='%s' date='%s'", arg1, arg2, arg3' \
+    'u::p2 "j=%d flag=%d", arg1, arg2'
 ```
 
-`trace` will output the values of `arg1` and `arg2` from probe `p1` and the
-value of `arg1` from probe `p2`.
+or alternatively the same thing with `bpftrace`
+
+```bash
+sudo bpftrace -p "$(pgrep -n salpdemo)" /dev/stdin <<EOF
+  usdt:p1 { printf("i=%d err='%s' date='%s'\n", arg0, str(arg1), str(arg2)); }
+  usdt:p2 { printf("j=%d flag=%d\n", arg0, arg1); }
+EOF
+```
+
+Either trace invocations will output the values of the three args to probe 1 and
+the two args to probe 2.
