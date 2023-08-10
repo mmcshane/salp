@@ -71,6 +71,7 @@ void salp_probeFire(SDTProbe_t* p, void** args) {
 import "C"
 import (
 	"fmt"
+	"sync/atomic"
 	"unsafe"
 )
 
@@ -236,7 +237,7 @@ func (p *Probe) Enabled() bool {
 
 	// ~100x lower overhead for this implementation, probably due to avoiding
 	// the CGO context switch and making inlining possible.
-	ptr := p._fire
+	ptr := atomic.LoadPointer(&p._fire)
 	return uintptr(ptr) != 0 && *(*uint8)(ptr)&0x90 != 0x90
 }
 
