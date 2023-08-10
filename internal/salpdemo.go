@@ -18,7 +18,7 @@ var (
 
 func main() {
 	defer salp.UnloadAndDispose(probes)
-	fmt.Println(`List the go probes in this demo
+	msg := `List the go probes in this demo
 	# With bcc tools
 	sudo tplist -vp "$(pgrep -n salpdemo)" "*salp-demo*"
 
@@ -31,7 +31,9 @@ Trace this process
 
 	# With bpftrace
 	sudo bpftrace -p "$(pgrep -n salpdemo)" -e 'usdt:p1 { printf("%d (%s)\n", arg0, str(arg2)); }'
-	sudo bpftrace -p "$(pgrep -n salpdemo)" -e 'usdt:p2 { if(arg1) { printf("Truthy! %d\n", arg0); } }'`)
+	sudo bpftrace -p "$(pgrep -n salpdemo)" -e 'usdt:p2 { if(arg1) { printf("Truthy! %d\n", arg0); } }'`
+
+	fmt.Println(msg)
 
 	salp.MustLoadProvider(probes)
 
